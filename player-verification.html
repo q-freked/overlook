@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Qbrick Player Configurator</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        --bg-gradient: radial-gradient(
+            circle at 20% 20%,
+            rgba(99, 102, 241, 0.35),
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 80% 0%,
+            rgba(236, 72, 153, 0.35),
+            transparent 45%
+          ),
+          #0f172a;
+        --panel-bg: rgba(15, 23, 42, 0.66);
+        --panel-border: rgba(148, 163, 184, 0.3);
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5f5;
+        --accent: #38bdf8;
+        --accent-soft: rgba(56, 189, 248, 0.22);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 40px 16px 64px;
+        display: flex;
+        justify-content: center;
+        font-family: var(--font-family);
+        background: var(--bg-gradient);
+        background-attachment: fixed;
+        color: var(--text-primary);
+      }
+
+      main {
+        width: min(1100px, 100%);
+        display: grid;
+        gap: 28px;
+      }
+
+      .top-nav {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .top-nav a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: rgba(15, 23, 42, 0.55);
+        color: inherit;
+        text-decoration: none;
+        transition: border-color 0.18s ease, transform 0.18s ease;
+      }
+
+      .top-nav a:hover {
+        border-color: rgba(56, 189, 248, 0.45);
+        transform: translateY(-1px);
+      }
+
+      header {
+        backdrop-filter: blur(24px);
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 24px;
+        padding: clamp(28px, 4vw, 42px);
+        display: grid;
+        gap: 16px;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+      }
+
+      header p {
+        margin: 0;
+        color: var(--text-secondary);
+        max-width: 640px;
+        line-height: 1.6;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(28px, 6.3vw, 48px);
+        line-height: 1.1;
+      }
+
+      .workspace {
+        display: grid;
+        gap: 28px;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        align-items: start;
+      }
+
+      .panel {
+        backdrop-filter: blur(24px);
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 24px;
+        padding: clamp(24px, 3vw, 32px);
+        display: grid;
+        gap: 24px;
+        box-shadow: 0 12px 45px rgba(15, 23, 42, 0.28);
+      }
+
+      .panel h2 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .toggles {
+        display: grid;
+        gap: 16px;
+      }
+
+      .toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.35);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+      }
+
+      .toggle strong {
+        font-size: 15px;
+      }
+
+      .toggle span {
+        color: rgba(203, 213, 225, 0.8);
+        font-size: 13px;
+        display: block;
+        margin-top: 4px;
+        max-width: 220px;
+      }
+
+      .toggle input {
+        appearance: none;
+        width: 48px;
+        height: 28px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.45);
+        background: rgba(148, 163, 184, 0.25);
+        position: relative;
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+
+      .toggle input::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 4px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.35);
+      }
+
+      .toggle input:checked {
+        background: var(--accent-soft);
+        border-color: rgba(56, 189, 248, 0.7);
+      }
+
+      .toggle input:checked::after {
+        transform: translateX(18px);
+        background: #0f172a;
+      }
+
+      .preview {
+        display: grid;
+        gap: 18px;
+      }
+
+      .preview iframe {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border: 0;
+        border-radius: 16px;
+        background: #020617;
+      }
+
+      .url-box {
+        display: grid;
+        gap: 12px;
+      }
+
+      .url-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .url-actions a,
+      .url-actions button {
+        appearance: none;
+        border: 0;
+        border-radius: 12px;
+        padding: 12px 18px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #38bdf8, #818cf8);
+        color: #0f172a;
+        text-decoration: none;
+        box-shadow: 0 14px 32px rgba(56, 189, 248, 0.35);
+      }
+
+      .url-actions button {
+        background: rgba(148, 163, 184, 0.18);
+        color: var(--text-primary);
+        box-shadow: none;
+      }
+
+      .url-actions button:hover,
+      .url-actions a:hover {
+        transform: translateY(-1px);
+      }
+
+      .url-actions button:active,
+      .url-actions a:active {
+        transform: translateY(0);
+      }
+
+      .url-display {
+        width: 100%;
+        font-family: "JetBrains Mono", "Fira Mono", ui-monospace, SFMono-Regular,
+          Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        background: rgba(15, 23, 42, 0.38);
+        border: 1px solid rgba(148, 163, 184, 0.32);
+        border-radius: 12px;
+        padding: 14px 16px;
+        color: var(--text-primary);
+        font-size: 13px;
+        word-break: break-all;
+        resize: none;
+      }
+
+      footer {
+        text-align: center;
+        color: rgba(148, 163, 184, 0.75);
+        font-size: 13px;
+      }
+
+      @media (max-width: 720px) {
+        body {
+          padding: 24px 12px 48px;
+        }
+
+        .toggle {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .toggle span {
+          max-width: none;
+        }
+
+        .url-actions {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .url-display {
+          font-size: 12px;
+          min-height: 120px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav class="top-nav">
+        <a href="index.html">← Back to hub</a>
+      </nav>
+      <header>
+        <h1>Qbrick Player Configurator</h1>
+        <p>
+          Toggle the available player options and preview how each setting
+          changes the playback experience. Every change updates the full Qbrick
+          player URL, so you can copy it or open it in a new tab instantly.
+        </p>
+      </header>
+
+      <section class="workspace">
+        <article class="panel">
+          <h2>Player Options</h2>
+          <div class="toggles">
+            <label class="toggle">
+              <div>
+                <strong>Autoplay</strong>
+                <span>Start playback automatically as soon as the player loads.</span>
+              </div>
+              <input
+                type="checkbox"
+                data-param="autoplay"
+                data-default="true"
+                aria-label="Toggle autoplay"
+              />
+            </label>
+            <label class="toggle">
+              <div>
+                <strong>Sharing</strong>
+                <span>Display sharing tools (social, direct link) inside the player.</span>
+              </div>
+              <input
+                type="checkbox"
+                data-param="sharing"
+                data-default="false"
+                aria-label="Toggle sharing"
+              />
+            </label>
+            <label class="toggle">
+              <div>
+                <strong>Download</strong>
+                <span>Let viewers download the original media file.</span>
+              </div>
+              <input
+                type="checkbox"
+                data-param="downloadMedia"
+                data-default="true"
+                aria-label="Toggle downloadMedia"
+              />
+            </label>
+            <label class="toggle">
+              <div>
+                <strong>Open in New Window</strong>
+                <span>Enable the option to pop out the player in a separate window.</span>
+              </div>
+              <input
+                type="checkbox"
+                data-param="openInNewWindow"
+                data-default="true"
+                aria-label="Toggle openInNewWindow"
+              />
+            </label>
+            <label class="toggle">
+              <div>
+                <strong>Repeat</strong>
+                <span>Loop playback when the video reaches the end.</span>
+              </div>
+              <input
+                type="checkbox"
+                data-param="repeat"
+                data-default="false"
+                aria-label="Toggle repeat"
+              />
+            </label>
+            <label class="toggle">
+              <div>
+                <strong>Mute</strong>
+                <span>Load the player with audio muted by default.</span>
+              </div>
+              <input
+                type="checkbox"
+                data-param="mute"
+                data-default="false"
+                aria-label="Toggle mute"
+              />
+            </label>
+            <label class="toggle">
+              <div>
+                <strong>Unique Frame</strong>
+                <span>Force this player instance to run in its own isolated frame.</span>
+              </div>
+              <input
+                type="checkbox"
+                data-param="uniqueFrame"
+                data-default="true"
+                aria-label="Toggle uniqueFrame"
+              />
+            </label>
+          </div>
+        </article>
+
+        <article class="panel preview">
+          <h2>Player Preview</h2>
+          <iframe
+            id="player-frame"
+            title="Qbrick player preview"
+            allow="autoplay; fullscreen"
+            src="about:blank"
+          ></iframe>
+
+          <div class="url-box">
+            <div class="url-actions">
+              <a id="open-player" href="#" target="_blank" rel="noopener">
+                Open in new tab
+              </a>
+              <button type="button" id="copy-url">Copy URL</button>
+            </div>
+            <textarea
+              id="player-url"
+              class="url-display"
+              readonly
+              rows="4"
+              spellcheck="false"
+            ></textarea>
+          </div>
+        </article>
+      </section>
+
+      <footer>Built for quick Qbrick player experiments &middot; <span id="year"></span></footer>
+    </main>
+
+    <script>
+      (function () {
+        const baseUrl = "https://play2.qbrick.com/qplayer/index.html";
+        const requiredParams = {
+          accountId: "140529",
+          mediaId: "42a986b2-82fb-4732-8c80-84840e4aef92",
+          configId: "Enterprise",
+        };
+
+        const toggleInputs = Array.from(
+          document.querySelectorAll('input[data-param]')
+        );
+        const iframe = document.getElementById("player-frame");
+        const urlDisplay = document.getElementById("player-url");
+        const openBtn = document.getElementById("open-player");
+        const copyBtn = document.getElementById("copy-url");
+        const footerYear = document.getElementById("year");
+
+        footerYear.textContent = new Date().getFullYear();
+
+        toggleInputs.forEach((input) => {
+          input.checked = input.dataset.default === "true";
+          input.addEventListener("change", updatePlayerUrl);
+        });
+
+        function buildUrl() {
+          const params = new URLSearchParams(requiredParams);
+          toggleInputs.forEach((input) => {
+            params.set(input.dataset.param, input.checked);
+          });
+          return `${baseUrl}?${params.toString()}`;
+        }
+
+        function updatePlayerUrl() {
+          const url = buildUrl();
+          urlDisplay.value = url;
+          iframe.src = url;
+          openBtn.href = url;
+        }
+
+        copyBtn.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(urlDisplay.value);
+            copyBtn.textContent = "Copied!";
+            setTimeout(() => (copyBtn.textContent = "Copy URL"), 1500);
+          } catch (error) {
+            urlDisplay.select();
+            document.execCommand("copy");
+            copyBtn.textContent = "Copied!";
+            setTimeout(() => (copyBtn.textContent = "Copy URL"), 1500);
+          }
+        });
+
+        updatePlayerUrl();
+      })();
+    </script>
+  </body>
+</html>
