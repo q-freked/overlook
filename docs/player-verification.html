@@ -122,6 +122,44 @@
         gap: 16px;
       }
 
+      .field-group {
+        display: grid;
+        gap: 6px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.35);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+      }
+
+      .field-group label {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text-primary);
+      }
+
+      .field-group input {
+        appearance: none;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        padding: 12px 14px;
+        font-size: 14px;
+        font-family: inherit;
+        background: rgba(15, 23, 42, 0.55);
+        color: var(--text-primary);
+        transition: border-color 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      .field-group input:focus {
+        outline: none;
+        border-color: rgba(56, 189, 248, 0.6);
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+      }
+
+      .field-group small {
+        font-size: 12px;
+        color: rgba(203, 213, 225, 0.75);
+      }
+
       .toggle {
         display: flex;
         align-items: center;
@@ -303,6 +341,28 @@
         <article class="panel">
           <h2>Player Options</h2>
           <div class="toggles">
+            <div class="field-group">
+              <label for="account-id">Account ID</label>
+              <input
+                type="text"
+                id="account-id"
+                name="accountId"
+                placeholder="Enter account ID"
+                autocomplete="off"
+              />
+              <small>Selects the Qbrick account the player loads from.</small>
+            </div>
+            <div class="field-group">
+              <label for="media-id">Media ID</label>
+              <input
+                type="text"
+                id="media-id"
+                name="mediaId"
+                placeholder="Enter media ID"
+                autocomplete="off"
+              />
+              <small>Defines the specific media asset displayed in the player.</small>
+            </div>
             <label class="toggle">
               <div>
                 <strong>Autoplay</strong>
@@ -422,16 +482,16 @@
 
     <script>
       (function () {
+        const DEFAULT_ACCOUNT_ID = "140529";
+        const DEFAULT_MEDIA_ID = "42a986b2-82fb-4732-8c80-84840e4aef92";
         const baseUrl = "https://play2.qbrick.com/qplayer/index.html";
-        const requiredParams = {
-          accountId: "140529",
-          mediaId: "42a986b2-82fb-4732-8c80-84840e4aef92",
-          configId: "Enterprise",
-        };
+        const staticParams = { configId: "Enterprise" };
 
         const toggleInputs = Array.from(
           document.querySelectorAll('input[data-param]')
         );
+        const accountInput = document.getElementById("account-id");
+        const mediaInput = document.getElementById("media-id");
         const iframe = document.getElementById("player-frame");
         const urlDisplay = document.getElementById("player-url");
         const openBtn = document.getElementById("open-player");
@@ -440,13 +500,26 @@
 
         footerYear.textContent = new Date().getFullYear();
 
+        accountInput.value = DEFAULT_ACCOUNT_ID;
+        mediaInput.value = DEFAULT_MEDIA_ID;
+
         toggleInputs.forEach((input) => {
           input.checked = input.dataset.default === "true";
           input.addEventListener("change", updatePlayerUrl);
         });
 
+        accountInput.addEventListener("input", updatePlayerUrl);
+        mediaInput.addEventListener("input", updatePlayerUrl);
+
+        function getFieldValue(input, fallback) {
+          const value = input.value.trim();
+          return value || fallback;
+        }
+
         function buildUrl() {
-          const params = new URLSearchParams(requiredParams);
+          const params = new URLSearchParams(staticParams);
+          params.set("accountId", getFieldValue(accountInput, DEFAULT_ACCOUNT_ID));
+          params.set("mediaId", getFieldValue(mediaInput, DEFAULT_MEDIA_ID));
           toggleInputs.forEach((input) => {
             params.set(input.dataset.param, input.checked);
           });
